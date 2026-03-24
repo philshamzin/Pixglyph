@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>▓░ Pixglyph — Image → ASCII</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230c0c0a'/%3E%3Ctext x='2' y='13' font-family='monospace' font-size='9' fill='%236dbd7a'%3E%u2593%u2592%3C/text%3E%3Ctext x='2' y='22' font-family='monospace' font-size='9' fill='%236dbd7a'%3E%u2592%u2591%3C/text%3E%3Ctext x='16' y='13' font-family='monospace' font-size='9' fill='%234a8a4a'%3E%u2591 %3C/text%3E%3Ctext x='16' y='22' font-family='monospace' font-size='9' fill='%232d4d35'%3E  %3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="noise-overlay"></div>
+
+<div id="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo">PIX<span class="logo-accent">GLYPH</span></div>
+      <span class="version-tag">v1.0.0</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-indicator">
+        <span class="dot dot--green pulse"></span>
+        <span class="status-text">SYSTEM_ONLINE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main class="layout">
+
+    <!-- LEFT PANEL -->
+    <aside class="panel panel--left">
+      <div class="panel-header">
+        <span class="panel-label">// input_parameters</span>
+        <span class="panel-id">TX_01</span>
+      </div>
+
+      <!-- UPLOAD -->
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*" hidden>
+        <div class="upload-ascii" id="upload-ascii-art">
+▓▓▒▒░  ░▒▒▓▓
+▒░  [+IMG+]  ░▒
+░▒▒▓▓  ▓▓▒▒░</div>
+        <div class="upload-label">DROP IMAGE / CLICK</div>
+        <div class="upload-sub">jpg · png · gif · webp · max 10mb</div>
+        <div class="upload-sub" id="upload-filename"></div>
+      </div>
+
+      <!-- STYLE PICKER -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-bullet"></span>
+          style_matrix <span class="section-count">[ 6 ]</span>
+        </div>
+        <div class="style-grid" id="style-grid">
+          <div class="style-item active" data-style="matrix">
+            <div class="style-preview">@@%%&&**
+%%&&**##
+&&**##@@</div>
+            <div class="style-name">Matrix</div>
+          </div>
+          <div class="style-item" data-style="braille">
+            <div class="style-preview">⠿⠻⠿⣿⡟⠛
+⣿⡇⢿⡇⠀⠀
+⠿⠻⣿⡟⠛⠁</div>
+            <div class="style-name">Braille</div>
+          </div>
+          <div class="style-item" data-style="cyberpunk">
+            <div class="style-preview">█▓▒░·:;=
+▓▒░·:;=x
+▒░·:;=xX</div>
+            <div class="style-name">Cyberpunk</div>
+          </div>
+          <div class="style-item" data-style="retro">
+            <div class="style-preview"> ,-~~-. 
+/ .  `\
+\,.._,-/</div>
+            <div class="style-name">Retro</div>
+          </div>
+          <div class="style-item" data-style="blockart">
+            <div class="style-preview">█▓▒▓█▒▓
+▓█▒▓█▓▒
+▒▓█▓▒▓█</div>
+            <div class="style-name">Block Art</div>
+          </div>
+          <div class="style-item" data-style="halftone">
+            <div class="style-preview">. . · · ░
+ · · ▒ ▒ ▓
+· · ▒ ▓ █ </div>
+            <div class="style-name">Halftone</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARAMS -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-bullet"></span>
+          quantize_params
+        </div>
+        <div class="sliders">
+          <div class="slider-row">
+            <label class="slider-label">width_chars</label>
+            <input type="range" min="40" max="200" value="100" step="1" id="sl-width" class="slider">
+            <span class="slider-val" id="sv-width">100</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">contrast</label>
+            <input type="range" min="-100" max="100" value="10" step="1" id="sl-contrast" class="slider">
+            <span class="slider-val" id="sv-contrast">+10</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">brightness</label>
+            <input type="range" min="-100" max="100" value="0" step="1" id="sl-bright" class="slider">
+            <span class="slider-val" id="sv-bright">0</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">detail_lvl</label>
+            <input type="range" min="1" max="3" value="2" step="1" id="sl-detail" class="slider">
+            <span class="slider-val" id="sv-detail">med</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">sharpness</label>
+            <input type="range" min="0" max="100" value="0" step="1" id="sl-sharp" class="slider">
+            <span class="slider-val" id="sv-sharp">0</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">saturation</label>
+            <input type="range" min="-100" max="100" value="0" step="1" id="sl-sat" class="slider">
+            <span class="slider-val" id="sv-sat">0</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">edge_boost</label>
+            <input type="range" min="0" max="100" value="0" step="1" id="sl-edge" class="slider">
+            <span class="slider-val" id="sv-edge">0</span>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">char_density</label>
+            <input type="range" min="1" max="5" value="3" step="1" id="sl-dens" class="slider">
+            <span class="slider-val" id="sv-dens">3</span>
+          </div>
+        </div>
+        <div class="toggles-row">
+          <div class="toggle-item">
+            <span class="toggle-label">invert</span>
+            <div class="toggle" id="toggle-inv" data-on="false">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div class="toggle-item">
+            <span class="toggle-label">color_mode</span>
+            <div class="toggle toggle--on" id="toggle-color" data-on="true">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RENDER BTN -->
+      <div class="render-section">
+        <button class="render-btn" id="render-btn">
+          <span class="render-btn-text">// RENDER →</span>
+          <div class="render-progress" id="render-progress"></div>
+        </button>
+      </div>
+    </aside>
+
+    <!-- CENTER CANVAS -->
+    <section class="canvas-wrap">
+      <div class="canvas-header">
+        <div class="canvas-meta">
+          <span id="canvas-style-label">OUTPUT_CANVAS // STYLE: MATRIX</span>
+          <span class="canvas-sep">|</span>
+          <span id="canvas-size-label">120×48</span>
+        </div>
+        <div class="canvas-right">
+          <span class="cursor-pos" id="cursor-pos">X:— Y:—</span>
+          <button class="icon-btn" id="fullscreen-btn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <div class="ascii-canvas" id="ascii-canvas">
+        <canvas id="hidden-canvas" style="display:none"></canvas>
+        <div class="ascii-output" id="ascii-output">
+          <div class="placeholder">
+            <div class="placeholder-art" id="placeholder-art"></div>
+            <div class="placeholder-hint">[ DROP AN IMAGE TO BEGIN ]</div>
+          </div>
+        </div>
+        <div class="canvas-drop-overlay" id="canvas-drop-overlay">
+          <div class="canvas-drop-label">▓▒░ DROP IMAGE ░▒▓</div>
+        </div>
+      </div>
+
+      <div class="canvas-footer">
+        <div class="export-btns">
+          <button class="exp-btn" data-fmt="txt">TXT</button>
+          <button class="exp-btn" data-fmt="svg">SVG</button>
+          <button class="exp-btn" data-fmt="png">PNG</button>
+          <button class="exp-btn" data-fmt="html">HTML</button>
+          <button class="exp-btn" data-fmt="ansi">ANSI</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL -->
+    <aside class="panel panel--right">
+      <div class="panel-header">
+        <span class="panel-label">// output_params</span>
+        <span class="panel-id">RX_02</span>
+      </div>
+
+      <div class="section">
+        <div class="params-list">
+          <div class="param-row"><span class="param-key">chars_w</span><span class="param-val" id="p-w">—</span></div>
+          <div class="param-row"><span class="param-key">chars_h</span><span class="param-val" id="p-h">—</span></div>
+          <div class="param-row"><span class="param-key">total_chars</span><span class="param-val" id="p-total">—</span></div>
+          <div class="param-row"><span class="param-key">render_ms</span><span class="param-val" id="p-ms">—</span></div>
+          <div class="param-row"><span class="param-key">px_ratio</span><span class="param-val" id="p-ratio">—</span></div>
+          <div class="param-row"><span class="param-key">style</span><span class="param-val" id="p-style">MATRIX</span></div>
+          <div class="param-row"><span class="param-key">color_mode</span><span class="param-val" id="p-color">ON</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span class="section-bullet"></span>
+          luminance_histogram
+        </div>
+        <div class="histogram" id="histogram">
+          <div class="histo-row"><span class="histo-lbl">░</span><div class="histo-bg"><div class="histo-fill" id="hf-0" style="width:72%"></div></div><span class="histo-num" id="hn-0">72%</span></div>
+          <div class="histo-row"><span class="histo-lbl">▒</span><div class="histo-bg"><div class="histo-fill" id="hf-1" style="width:54%"></div></div><span class="histo-num" id="hn-1">54%</span></div>
+          <div class="histo-row"><span class="histo-lbl">▓</span><div class="histo-bg"><div class="histo-fill" id="hf-2" style="width:33%"></div></div><span class="histo-num" id="hn-2">33%</span></div>
+          <div class="histo-row"><span class="histo-lbl">█</span><div class="histo-bg"><div class="histo-fill" id="hf-3" style="width:14%"></div></div><span class="histo-num" id="hn-3">14%</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span class="section-bullet"></span>
+          recent_renders
+        </div>
+        <div class="gallery-grid" id="gallery"></div>
+      </div>
+    </aside>
+
+  </main>
+
+</div>
+
+<!-- FULLSCREEN MODAL -->
+<div class="fullscreen-overlay" id="fullscreen-overlay">
+  <div class="fullscreen-header">
+    <span class="fullscreen-label">PIXGLYPH // FULLSCREEN_VIEW</span>
+    <button class="fullscreen-close" id="fullscreen-close">[ CLOSE ]</button>
+  </div>
+  <div class="fullscreen-content" id="fullscreen-content"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/quantize.js"></script>
+<script src="js/exporters.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
