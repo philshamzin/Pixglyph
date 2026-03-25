@@ -449,25 +449,103 @@ function loadFromUrl() {
   if (p.get('color'))   { State.colorMode = p.get('color') !== '0'; document.getElementById('toggle-color').classList.toggle('toggle--on', State.colorMode); }
 }
 
-// ── THEME TOGGLE ───────────────────────────────────────────────────────────────
+// ── THEME TOGGLE — laboratory scan wipe ───────────────────────────────────────
 function initTheme() {
   const btn = document.getElementById('theme-btn');
   if (!btn) return;
-  // Restore saved preference
+
+  // Restore saved preference instantly (no animation on load)
   if (localStorage.getItem('pg-theme') === 'light') {
     document.body.classList.add('light');
     btn.textContent = '◑';
   }
+
   btn.addEventListener('click', () => {
-    const isLight = document.body.classList.toggle('light');
-    btn.textContent = isLight ? '◑' : '◐';
-    localStorage.setItem('pg-theme', isLight ? 'light' : 'dark');
+    const goingLight = !document.body.classList.contains('light');
+    triggerThemeWipe(goingLight, () => {
+      document.body.classList.toggle('light', goingLight);
+      btn.textContent = goingLight ? '◑' : '◐';
+      localStorage.setItem('pg-theme', goingLight ? 'light' : 'dark');
+    });
   });
 }
 
+function triggerThemeWipe(goingLight, onMidpoint) {
+  // Create fullscreen wipe overlay
+  const wipe = document.createElement('div');
+  wipe.id = 'theme-wipe';
+  Object.assign(wipe.style, {
+    position: 'fixed', inset: '0', zIndex: '9999',
+    pointerEvents: 'none', overflow: 'hidden',
+  });
+
+  // Scanline strips — 20 horizontal bands that fill sequentially
+  const STRIPS = 24;
+  const stripH = Math.ceil(window.innerHeight / STRIPS);
+  const targetBg = goingLight ? '#f0f0eb' : '#0c0c0a';
+  const glowColor = goingLight ? 'rgba(46,138,66,0.9)' : 'rgba(109,189,122,0.9)';
+
+  for (let i = 0; i < STRIPS; i++) {
+    const strip = document.createElement('div');
+    Object.assign(strip.style, {
+      position: 'absolute',
+      left: '0', right: '0',
+      top: (i * stripH) + 'px',
+      height: stripH + 'px',
+      background: targetBg,
+      transform: 'scaleX(0)',
+      transformOrigin: i % 2 === 0 ? 'left' : 'right',
+      boxShadow: i % 3 === 0 ? `0 0 8px 2px ${glowColor}` : 'none',
+    });
+    // Stagger each strip
+    const delay = i * 18 + (Math.random() * 12);
+    strip.style.transition = `transform ${110 + Math.random() * 60}ms ease-in ${delay}ms`;
+    wipe.appendChild(strip);
+  }
+
+  document.body.appendChild(wipe);
+
+  // Trigger strips to expand
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      wipe.querySelectorAll('div').forEach(s => { s.style.transform = 'scaleX(1)'; });
+    });
+  });
+
+  // At ~50% through: flip theme, then retract strips
+  const totalDuration = STRIPS * 18 + 200;
+  setTimeout(() => {
+    onMidpoint();
+
+    // Add glitch flash
+    const flash = document.createElement('div');
+    Object.assign(flash.style, {
+      position: 'absolute', inset: '0',
+      background: glowColor, opacity: '0.15',
+      transition: 'opacity 80ms',
+    });
+    wipe.appendChild(flash);
+    requestAnimationFrame(() => { flash.style.opacity = '0'; });
+
+    // Retract strips in reverse order
+    const strips = Array.from(wipe.querySelectorAll('div:not(:last-child)'));
+    strips.reverse().forEach((s, i) => {
+      const delay = i * 14;
+      s.style.transition = `transform ${90 + Math.random() * 40}ms ease-out ${delay}ms`;
+      s.style.transform = 'scaleX(0)';
+    });
+
+    // Remove overlay
+    setTimeout(() => {
+      if (wipe.parentNode) wipe.parentNode.removeChild(wipe);
+    }, strips.length * 14 + 180);
+
+  }, totalDuration);
+}
+
 // ── ZOOM ───────────────────────────────────────────────────────────────────────
-const ZOOM_STEPS = [5, 6, 7, 8, 9, 10, 12, 14, 16];
-let zoomIdx = 2; // default = 7px
+const ZOOM_STEPS = [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28];
+let zoomIdx = 4; // default = 7px
 
 function initZoom() {
   const inBtn  = document.getElementById('zoom-in-btn');

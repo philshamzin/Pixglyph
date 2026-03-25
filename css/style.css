@@ -28,22 +28,51 @@
 
 /* LIGHT THEME */
 body.light {
-  --bg:            #f4f4f0;
-  --bg2:           #ebebе6;
-  --bg3:           #e2e2dc;
-  --bg4:           #d8d8d0;
-  --green:         #3a7a4a;
-  --green-bright:  #2e8a42;
-  --green-dim:     #a8d8b0;
-  --green-faint:   #d8f0dc;
-  --text:          #3a3a2e;
-  --text-dim:      #7a7a68;
-  --text-bright:   #1a1a12;
-  --text-faint:    #c0c0b0;
-  --border:        #ccccc4;
-  --border-mid:    #b8b8b0;
-  --border-green:  #a0c8a8;
+  --bg:            #f2f2ee;
+  --bg2:           #e8e8e2;
+  --bg3:           #dededa;
+  --bg4:           #d4d4ce;
+  --green:         #1e7a32;
+  --green-bright:  #1a6e2c;
+  --green-dim:     #6ab87a;
+  --green-faint:   #d0ead4;
+  --text:          #2c2c22;
+  --text-dim:      #5e5e50;
+  --text-bright:   #0e0e08;
+  --text-faint:    #a0a090;
+  --border:        #c0c0b8;
+  --border-mid:    #a8a8a0;
+  --border-green:  #7ab888;
 }
+
+/* Light theme — ensure all UI text uses theme vars (no hardcoded colors) */
+body.light .param-val        { color: var(--green-bright); }
+body.light .panel-id         { color: var(--green-dim); }
+body.light .section-count    { color: var(--green-dim); }
+body.light .section-bullet   { background: var(--green-bright); }
+body.light .histo-fill       { background: var(--green-bright); }
+body.light .dot--green       { background: var(--green-bright); }
+body.light .status-text      { color: var(--green-bright); }
+body.light .slider-val       { color: var(--green-bright); }
+body.light .logo-accent      { color: var(--green-bright); }
+body.light .render-btn       { border-color: var(--green-bright); color: var(--green-bright); background: var(--green-faint); }
+body.light .render-btn:hover { background: var(--green-dim); color: #fff; }
+body.light .exp-btn:hover    { border-color: var(--green-bright); color: var(--green-bright); }
+body.light .icon-btn:hover   { border-color: var(--green-bright); color: var(--green-bright); }
+body.light .style-item.active { border-color: var(--green-bright); }
+body.light .style-item.active .style-preview { color: var(--green-bright); }
+body.light .style-item.active .style-name    { color: var(--text-bright); }
+body.light .upload-zone:hover,
+body.light .upload-zone.dragover { border-color: var(--green-bright); background: var(--green-faint); }
+body.light .toggle--on        { background: var(--green-faint); border-color: var(--green-bright); }
+body.light .toggle--on .toggle-thumb { background: var(--green-bright); }
+body.light #upload-filename   { color: var(--green-bright); }
+body.light .canvas-drop-label { color: var(--green-bright); }
+body.light .canvas-drop-overlay { border-color: var(--green-bright); background: rgba(240,245,240,0.92); }
+body.light .fullscreen-close  { color: var(--green-bright); border-color: var(--green-bright); }
+body.light .ascii-output      { color: var(--text-bright); }
+body.light .gallery-item:hover { border-color: var(--green-bright); }
+body.light .zoom-label         { color: var(--text-dim); }
 
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--mono); font-size: var(--font-size-base); overflow: hidden; }
 
@@ -365,14 +394,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* LIGHT THEME — scanlines invisible */
 body.light .scanlines { opacity: 0; }
 body.light .noise-overlay { opacity: 0; }
-body.light .ascii-output .c0 { color: #b0d0b0; }
-body.light .ascii-output .c1 { color: #80b880; }
-body.light .ascii-output .c2 { color: #509850; }
-body.light .ascii-output .c3 { color: #307830; }
-body.light .ascii-output .c4 { color: #1a5a1a; }
-body.light .ascii-output .c5 { color: #0a3a0a; }
-body.light .ascii-output .c6 { color: #062806; }
-body.light .ascii-output .c7 { color: #031803; }
+body.light .ascii-output .c0 { color: #c8e8c8; }
+body.light .ascii-output .c1 { color: #9acc9a; }
+body.light .ascii-output .c2 { color: #6aaa6a; }
+body.light .ascii-output .c3 { color: #3a883a; }
+body.light .ascii-output .c4 { color: #1e6a1e; }
+body.light .ascii-output .c5 { color: #0e500e; }
+body.light .ascii-output .c6 { color: #083808; }
+body.light .ascii-output .c7 { color: #042404; }
 
 /* MOBILE */
 @media (max-width: 768px) {
