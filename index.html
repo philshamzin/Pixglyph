@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,14 +20,19 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
+      <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
       <div class="logo">PIX<span class="logo-accent">GLYPH</span></div>
-      <span class="version-tag">v1.0.0</span>
+      <span class="version-tag">v1.1.0</span>
     </div>
     <div class="topbar-right">
       <div class="status-indicator">
         <span class="dot dot--green pulse"></span>
         <span class="status-text">SYSTEM_ONLINE</span>
       </div>
+      <button class="icon-btn" id="theme-btn" title="Toggle light/dark theme">◐</button>
+      <button class="icon-btn" id="zoom-out-btn" title="Zoom out">−</button>
+      <span class="zoom-label" id="zoom-label">100%</span>
+      <button class="icon-btn" id="zoom-in-btn" title="Zoom in">+</button>
     </div>
   </header>
 
@@ -65,11 +71,11 @@
 &&**##@@</div>
             <div class="style-name">Matrix</div>
           </div>
-          <div class="style-item" data-style="braille">
-            <div class="style-preview">⠿⠻⠿⣿⡟⠛
-⣿⡇⢿⡇⠀⠀
-⠿⠻⣿⡟⠛⠁</div>
-            <div class="style-name">Braille</div>
+          <div class="style-item" data-style="lines">
+            <div class="style-preview">|/\|/\|/
+\|/\|/\|
+/\|/\|/\</div>
+            <div class="style-name">Lines</div>
           </div>
           <div class="style-item" data-style="cyberpunk">
             <div class="style-preview">█▓▒░·:;=
@@ -107,7 +113,7 @@
         <div class="sliders">
           <div class="slider-row">
             <label class="slider-label">width_chars</label>
-            <input type="range" min="40" max="200" value="100" step="1" id="sl-width" class="slider">
+            <input type="range" min="40" max="300" value="100" step="1" id="sl-width" class="slider">
             <span class="slider-val" id="sv-width">100</span>
           </div>
           <div class="slider-row">
@@ -262,6 +268,9 @@
   </div>
   <div class="fullscreen-content" id="fullscreen-content"></div>
 </div>
+
+<!-- MOBILE BACKDROP -->
+<div class="mobile-backdrop" id="mobile-backdrop"></div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>

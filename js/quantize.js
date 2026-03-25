@@ -11,10 +11,8 @@ const CHAR_SETS = {
   retro:     [' ', ' ', '.', "'", '`', '+', ';', ':', ',', '|', '!', '?', '>'],
   blockart:  [' ', ' ', '░', '░', '▒', '▒', '▓', '▓', '█', '█'],
   halftone:  [' ', ' ', '.', '·', '°', 'o', 'O', '0', '@', '■'],
+  lines:     [' ', ' ', '·', '-', '~', '=', '+', 'T', 'H', '#'],
 };
-
-const BRAILLE_BASE = 0x2800;
-const BRAILLE_DOTS = [0x01, 0x02, 0x04, 0x40, 0x08, 0x10, 0x20, 0x80];
 
 function quantizeImage(imageSrc, opts = {}) {
   const {
@@ -40,15 +38,8 @@ function quantizeImage(imageSrc, opts = {}) {
   const aspectRatio = naturalH / naturalW;
 
   let pixelW, pixelH;
-  if (style === 'braille') {
-    const CHAR_ASPECT = 0.49;
-    pixelW = width * 2;
-    pixelH = Math.round(pixelW * aspectRatio * CHAR_ASPECT * 2);
-    pixelH = Math.ceil(pixelH / 4) * 4;
-  } else {
-    pixelW = width;
-    pixelH = Math.round(width * aspectRatio * FONT_RATIO);
-  }
+  pixelW = width;
+  pixelH = Math.round(width * aspectRatio * FONT_RATIO);
 
   canvas.width  = pixelW;
   canvas.height = pixelH;
@@ -66,17 +57,16 @@ function quantizeImage(imageSrc, opts = {}) {
   const imageData = ctx.getImageData(0, 0, pixelW, pixelH);
   let data = imageData.data;
 
+  // Free GPU: clear canvas immediately after pixel read
+  ctx.clearRect(0, 0, pixelW, pixelH);
+  canvas.width = 1; canvas.height = 1;
+
   // Edge boost: blend Sobel edges into luminance
   if (edgeBoost > 0) {
     data = applyEdgeBoost(data, pixelW, pixelH, edgeBoost / 100);
   }
 
-  let lines, colorLines = null;
-  if (style === 'braille') {
-    ({ lines, colorLines } = renderBraille(data, pixelW, pixelH, invert, colorMode));
-  } else {
-    ({ lines, colorLines } = renderStandard(data, pixelW, pixelH, style, invert, colorMode, detail, charDensity));
-  }
+  const { lines, colorLines } = renderStandard(data, pixelW, pixelH, style, invert, colorMode, detail, charDensity);
 
   const histogram = computeHistogram(data, pixelW, pixelH);
   const renderMs  = Math.round(performance.now() - t0);
@@ -151,51 +141,6 @@ function renderStandard(data, w, h, style, invert, colorMode, detail, charDensit
       const charIdx = Math.min(maxIdx, Math.floor((lum / 255) * (maxIdx + 0.99)));
       line += chars[charIdx];
       if (colorMode && colorLine) colorLine.push({ r, g, b });
-    }
-    lines.push(line);
-    if (colorMode && colorLines) colorLines.push(colorLine);
-  }
-  return { lines, colorLines };
-}
-
-// ── BRAILLE RENDER ─────────────────────────────────────────────────────────────
-function renderBraille(data, w, h, invert, colorMode) {
-  const bW   = Math.floor(w / 2);
-  const bH   = Math.floor(h / 4);
-  const lines = [];
-  const colorLines = colorMode ? [] : null;
-  const threshold  = 128;
-  const DOT_MAP    = [[0,0,0],[0,1,1],[0,2,2],[0,3,6],[1,0,3],[1,1,4],[1,2,5],[1,3,7]];
-
-  for (let by = 0; by < bH; by++) {
-    let line = '';
-    const colorLine = colorMode ? [] : null;
-
-    for (let bx = 0; bx < bW; bx++) {
-      let code = BRAILLE_BASE;
-      let totalR = 0, totalG = 0, totalB = 0, count = 0;
-
-      DOT_MAP.forEach(([col, row, dotIdx]) => {
-        const px = bx * 2 + col;
-        const py = by * 4 + row;
-        if (px < w && py < h) {
-          const idx = (py * w + px) * 4;
-          const r = data[idx], g = data[idx+1], b = data[idx+2];
-          const lum = getLuminance(r, g, b);
-          totalR += r; totalG += g; totalB += b; count++;
-          const active = invert ? lum >= threshold : lum < threshold;
-          if (active) code |= BRAILLE_DOTS[dotIdx];
-        }
-      });
-
-      line += String.fromCodePoint(code);
-      if (colorMode && colorLine && count > 0) {
-        colorLine.push({
-          r: Math.round(totalR / count),
-          g: Math.round(totalG / count),
-          b: Math.round(totalB / count),
-        });
-      }
     }
     lines.push(line);
     if (colorMode && colorLines) colorLines.push(colorLine);

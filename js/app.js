@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initFullscreen();
   initCanvasMouseMove();
   initMatrixAnimation();
+  initTheme();
+  initZoom();
+  initMobileMenu();
   loadFromUrl();
 });
 
@@ -444,4 +447,81 @@ function loadFromUrl() {
   setSlider('brightness', 'sl-bright',   'sv-bright',   v => (v > 0 ? '+' : '') + v);
   if (p.get('invert'))  { State.invert = p.get('invert') === '1'; document.getElementById('toggle-inv').classList.toggle('toggle--on', State.invert); }
   if (p.get('color'))   { State.colorMode = p.get('color') !== '0'; document.getElementById('toggle-color').classList.toggle('toggle--on', State.colorMode); }
+}
+
+// ── THEME TOGGLE ───────────────────────────────────────────────────────────────
+function initTheme() {
+  const btn = document.getElementById('theme-btn');
+  if (!btn) return;
+  // Restore saved preference
+  if (localStorage.getItem('pg-theme') === 'light') {
+    document.body.classList.add('light');
+    btn.textContent = '◑';
+  }
+  btn.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light');
+    btn.textContent = isLight ? '◑' : '◐';
+    localStorage.setItem('pg-theme', isLight ? 'light' : 'dark');
+  });
+}
+
+// ── ZOOM ───────────────────────────────────────────────────────────────────────
+const ZOOM_STEPS = [5, 6, 7, 8, 9, 10, 12, 14, 16];
+let zoomIdx = 2; // default = 7px
+
+function initZoom() {
+  const inBtn  = document.getElementById('zoom-in-btn');
+  const outBtn = document.getElementById('zoom-out-btn');
+  const label  = document.getElementById('zoom-label');
+  if (!inBtn || !outBtn) return;
+
+  function applyZoom() {
+    const px = ZOOM_STEPS[zoomIdx];
+    document.documentElement.style.setProperty('--ascii-zoom', px + 'px');
+    const pct = Math.round((px / 7) * 100);
+    if (label) label.textContent = pct + '%';
+  }
+
+  inBtn.addEventListener('click', () => {
+    if (zoomIdx < ZOOM_STEPS.length - 1) { zoomIdx++; applyZoom(); }
+  });
+  outBtn.addEventListener('click', () => {
+    if (zoomIdx > 0) { zoomIdx--; applyZoom(); }
+  });
+
+  // Ctrl+scroll on canvas
+  document.getElementById('ascii-canvas').addEventListener('wheel', e => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    if (e.deltaY < 0 && zoomIdx < ZOOM_STEPS.length - 1) zoomIdx++;
+    else if (e.deltaY > 0 && zoomIdx > 0) zoomIdx--;
+    applyZoom();
+  }, { passive: false });
+}
+
+// ── MOBILE MENU ────────────────────────────────────────────────────────────────
+function initMobileMenu() {
+  const menuBtn  = document.getElementById('mobile-menu-btn');
+  const backdrop = document.getElementById('mobile-backdrop');
+  const panel    = document.querySelector('.panel--left');
+  if (!menuBtn || !backdrop || !panel) return;
+
+  function openMenu() {
+    panel.classList.add('mobile-open');
+    backdrop.classList.add('active');
+  }
+  function closeMenu() {
+    panel.classList.remove('mobile-open');
+    backdrop.classList.remove('active');
+  }
+
+  menuBtn.addEventListener('click', () => {
+    panel.classList.contains('mobile-open') ? closeMenu() : openMenu();
+  });
+  backdrop.addEventListener('click', closeMenu);
+
+  // Close menu after render button tap on mobile
+  document.getElementById('render-btn').addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeMenu();
+  });
 }
