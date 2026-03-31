@@ -49,4 +49,4 @@ Chrome 110+, Firefox 115+, Safari 16+
 
 ---
 
-v1.1.0
+v1.2.0
